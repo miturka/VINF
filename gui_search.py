@@ -21,13 +21,10 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QThread, Signal
 
 
-# ----- KONFIG: uprav si podľa seba -----
-DOCKER_CONTAINER_NAME = "pylucene"   # názov kontajnera
-PYTHON_IN_CONTAINER = "python"                 # alebo "python3" ak to tak máš
-SEARCH_SCRIPT_PATH = "/app/final/search.py"          # kde je search.py v kontajneri
-INDEX_DIR_IN_CONTAINER = "/app/final/index"         # path na index v kontajneri
-# --------------------------------------
-
+DOCKER_CONTAINER_NAME = "pylucene"  
+PYTHON_IN_CONTAINER = "python"       
+SEARCH_SCRIPT_PATH = "/app/search.py"         
+INDEX_DIR_IN_CONTAINER = "/app/index"        
 
 class SearchThread(QThread):
     """Background thread for search to keep UI responsive."""
