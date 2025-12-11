@@ -1,32 +1,34 @@
-import lucene # type: ignore
+import lucene  # type: ignore
 import json
 import re
 from pathlib import Path
 
-from java.nio.file import Paths # type: ignore
-from org.apache.lucene.analysis.standard import StandardAnalyzer # type: ignore
-from org.apache.lucene.document import ( # type: ignore
-    Document, Field, StringField, TextField,
-    IntPoint, StoredField
-) 
-from org.apache.lucene.index import IndexWriter, IndexWriterConfig # type: ignore
-from org.apache.lucene.store import FSDirectory # type: ignore
+from java.nio.file import Paths  # type: ignore
+from org.apache.lucene.analysis.standard import StandardAnalyzer  # type: ignore
+from org.apache.lucene.document import (  # type: ignore
+    Document,
+    Field,
+    StringField,
+    TextField,
+    IntPoint,
+    StoredField,
+)
+from org.apache.lucene.index import IndexWriter, IndexWriterConfig  # type: ignore
+from org.apache.lucene.store import FSDirectory  # type: ignore
 
 
 lucene.initVM()
 
-# ------------------------------------------------------
-# PARSERY
-# ------------------------------------------------------
 
 def parse_years_active(years_str: str):
-    # napr. "2011–present"
+    # "2011–present"
     if not years_str:
         return None
     m = re.match(r"(\d{4})", years_str)
     if m:
         return int(m.group(1))
     return None
+
 
 def parse_opened_year(opened_str: str):
     # "{{start date|2017|04|22}}" -> 2017
@@ -37,10 +39,6 @@ def parse_opened_year(opened_str: str):
         return int(m.group(1))
     return None
 
-
-# ------------------------------------------------------
-# INDEX BUILDER
-# ------------------------------------------------------
 
 def build_index(jsonl_path: str, index_dir: str):
     directory = FSDirectory.open(Paths.get(index_dir))
@@ -55,7 +53,6 @@ def build_index(jsonl_path: str, index_dir: str):
 
     with jsonl_path.open("r", encoding="utf-8") as f:
         for i, line in enumerate(f, start=1):
-
             line = line.strip()
             if not line:
                 continue
@@ -63,9 +60,6 @@ def build_index(jsonl_path: str, index_dir: str):
             data = json.loads(line)
             doc = Document()
 
-            # ------------------------------------------------------
-            # BASIC FIELDS
-            # ------------------------------------------------------
             artist = data.get("artist") or ""
             venue = data.get("venue") or ""
             city = data.get("city") or ""
@@ -75,21 +69,16 @@ def build_index(jsonl_path: str, index_dir: str):
             songs_count = data.get("songs_count") or 0
 
             doc.add(TextField("artist", artist, Field.Store.YES))
-            doc.add(StringField("artist_exact", artist, Field.Store.YES))
 
             doc.add(TextField("venue", venue, Field.Store.YES))
-            doc.add(StringField("venue_exact", venue, Field.Store.YES))
 
             doc.add(TextField("city", city, Field.Store.YES))
-            doc.add(StringField("city_exact", city, Field.Store.YES))
 
             doc.add(TextField("country", country, Field.Store.YES))
-            doc.add(StringField("country_exact", country, Field.Store.YES))
 
             doc.add(StoredField("date", date_str))
             doc.add(TextField("date_text", date_str, Field.Store.NO))
 
-            # extrahuj rok z "Feb 11, 2022"
             m = re.search(r"(\d{4})", date_str)
             if m:
                 year = int(m.group(1))
@@ -106,11 +95,10 @@ def build_index(jsonl_path: str, index_dir: str):
                 doc.add(StringField("path", data["path"], Field.Store.YES))
             if data.get("url"):
                 doc.add(StringField("url", data["url"], Field.Store.YES))
-            
+
             tour = data.get("tour") or ""
             if tour:
                 doc.add(TextField("tour", tour, Field.Store.YES))
-                doc.add(StringField("tour_exact", tour, Field.Store.YES))
 
             # ------------------------------------------------------
             # ARTIST SECTIONS
@@ -121,7 +109,9 @@ def build_index(jsonl_path: str, index_dir: str):
             if artist_bio:
                 doc.add(TextField("artist_bio", artist_bio, Field.Store.YES))
             if artist_discography:
-                doc.add(TextField("artist_discography", artist_discography, Field.Store.YES))
+                doc.add(
+                    TextField("artist_discography", artist_discography, Field.Store.YES)
+                )
 
             # ------------------------------------------------------
             # ARTIST INFOBOX
@@ -129,7 +119,6 @@ def build_index(jsonl_path: str, index_dir: str):
             artist_genre = data.get("artist_genre") or ""
             if artist_genre:
                 doc.add(TextField("artist_genre", artist_genre, Field.Store.YES))
-                doc.add(StringField("artist_genre_exact", artist_genre, Field.Store.YES))
 
             artist_origin = data.get("artist_origin") or ""
             if artist_origin:
@@ -137,7 +126,11 @@ def build_index(jsonl_path: str, index_dir: str):
 
             artist_years_active = data.get("artist_years_active") or ""
             if artist_years_active:
-                doc.add(TextField("artist_years_active", artist_years_active, Field.Store.YES))
+                doc.add(
+                    TextField(
+                        "artist_years_active", artist_years_active, Field.Store.YES
+                    )
+                )
                 start_year = parse_years_active(artist_years_active)
                 if start_year:
                     doc.add(IntPoint("artist_years_active_from", start_year))
@@ -145,7 +138,9 @@ def build_index(jsonl_path: str, index_dir: str):
 
             artist_birth_name = data.get("artist_birth_name") or ""
             if artist_birth_name:
-                doc.add(TextField("artist_birth_name", artist_birth_name, Field.Store.YES))
+                doc.add(
+                    TextField("artist_birth_name", artist_birth_name, Field.Store.YES)
+                )
 
             artist_website = data.get("artist_website") or ""
             if artist_website:
@@ -153,7 +148,11 @@ def build_index(jsonl_path: str, index_dir: str):
 
             artist_current_members = data.get("artist_current_members") or ""
             if artist_current_members:
-                doc.add(TextField("artist_current_members", artist_current_members, Field.Store.NO))
+                doc.add(
+                    TextField(
+                        "artist_current_members", artist_current_members, Field.Store.NO
+                    )
+                )
 
             # ------------------------------------------------------
             # VENUE SECTIONS & INFOBOX
@@ -210,11 +209,10 @@ def build_index(jsonl_path: str, index_dir: str):
 
             country_population = data.get("country_population") or ""
             if country_population:
-                doc.add(TextField("country_population", country_population, Field.Store.YES))
+                doc.add(
+                    TextField("country_population", country_population, Field.Store.YES)
+                )
 
-            # ------------------------------------------------------
-            # WRITE DOCUMENT
-            # ------------------------------------------------------
             writer.addDocument(doc)
 
             if i % 10000 == 0:
@@ -225,24 +223,16 @@ def build_index(jsonl_path: str, index_dir: str):
     print("Index build complete.")
 
 
-# ------------------------------------------------------
-# CLI
-# ------------------------------------------------------
-
 if __name__ == "__main__":
     import argparse
-    
+
     parser = argparse.ArgumentParser(
         description="Build Lucene index from enriched setlist JSONL data"
     )
     parser.add_argument(
-        "jsonl_path",
-        help="Path to input JSONL file with enriched setlist data"
+        "jsonl_path", help="Path to input JSONL file with enriched setlist data"
     )
-    parser.add_argument(
-        "index_dir",
-        help="Path to output directory for Lucene index"
-    )
-    
+    parser.add_argument("index_dir", help="Path to output directory for Lucene index")
+
     args = parser.parse_args()
     build_index(args.jsonl_path, args.index_dir)

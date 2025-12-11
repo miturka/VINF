@@ -27,11 +27,6 @@ US_STATE_CODES = {
 }
 
 
-# ============================================================================
-# WIKI EXTRACTION HELPER FUNCTIONS
-# ============================================================================
-
-
 def normalize_title(s: str) -> str:
     """Normalize string for matching (trim, normalize whitespace, lowercase)."""
     if s is None:
@@ -66,13 +61,6 @@ def normalize_title_variants(s: str) -> list:
 
 
 def normalize_entity(entity_value: str, entity_type: str, country: str = None) -> str:
-    """
-    Normalize entity values for Wikipedia matching.
-    
-    Special handling:
-    - USA country -> "United States" (for Wikipedia)
-    - USA city codes (state codes) -> full state names
-    """
     if entity_value is None:
         return None
     
@@ -92,7 +80,6 @@ def normalize_entity(entity_value: str, entity_type: str, country: str = None) -
 
 
 def detect_page_type(page_text: str) -> str:
-    """Detect what type of entity this Wikipedia page describes."""
     # Patterns to detect page types from Wikipedia content
     artist_patterns = [
         r"\[\[Category:[^\]]*\b(musicians|singers|bands|rappers|musical groups|music artists)\b",
@@ -320,7 +307,6 @@ def clean_wikitext(text: str) -> str:
 
     # Remove Wikipedia tables using depth counting
     def remove_tables(text: str) -> str:
-        """Remove {| ... |} table markup using depth counting."""
         result = []
         i = 0
         while i < len(text):
@@ -576,15 +562,7 @@ def extract_infobox_field_clean(page_xml: str, field_name: str) -> str | None:
 
 
 def process_wiki_page(row):
-    """
-    Process a Wikipedia page and extract sections/infobox based on entity type.
-
-    Args:
-        row: A Row object with fields: title, page_text, entity_type
-
-    Returns:
-        dict with extracted data
-    """
+    """Process a Wikipedia page and extract sections/infobox based on entity type."""
 
     title = row.title
     page_text = row.page_text
@@ -1178,9 +1156,6 @@ def main():
         "country_infobox",
     )
 
-    # Cache final enriched DataFrame before multiple operations
-    # enriched_df.cache()
-
     print("✅ Joins complete")
 
     # ========================================================================
@@ -1236,10 +1211,6 @@ def main():
     # Also save as single JSON file for convenience
     single_file = out_dir.rstrip("/").rstrip("\\") + "_single.json"
     print(f"💾 Writing single JSON file to {single_file}...")
-
-    # rows = [row.asDict(recursive=True) for row in enriched_df.collect()]
-    # with open(single_file, "w", encoding="utf-8") as f:
-    #     json.dump(rows, f, ensure_ascii=False, indent=2)
 
     single_dir = out_dir.rstrip("/").rstrip("\\") + "_single"
 
