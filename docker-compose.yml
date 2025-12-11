@@ -1,0 +1,27 @@
+name: vinf
+
+services:
+  spark:
+    image: spark:4.0.1-java21-python3
+    container_name: spark
+    working_dir: /opt/app
+    volumes:
+      - ./:/opt/app           
+      #- ./data:/data          
+    ports:
+      - "4040:4040"           # Spark UI (http://localhost:4040)
+    environment:
+      - PYSPARK_PYTHON=python3
+      - PYSPARK_DRIVER_PYTHON=python3
+      - SPARK_HOME=/opt/spark
+    command: ["bash", "-c", "sleep infinity"]
+    tty: true
+    stdin_open: true
+  
+  pylucene:
+    image: coady/pylucene:latest
+    container_name: pylucene
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: tail -f /dev/null
