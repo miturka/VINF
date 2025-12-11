@@ -4,7 +4,7 @@ A complete web scraping, data enrichment, and search system for concert setlists
 
 ---
 
-## 📋 Overview
+## Overview
 
 This project implements a full pipeline for collecting, processing, and searching concert setlist data:
 
@@ -16,7 +16,7 @@ This project implements a full pipeline for collecting, processing, and searchin
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ### Data Pipeline
 
@@ -42,7 +42,7 @@ This project implements a full pipeline for collecting, processing, and searchin
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -68,7 +68,7 @@ This starts two containers:
 
 ---
 
-## 📦 Components
+## Components
 
 ### 1. Crawler (`crawler.py`)
 
@@ -236,7 +236,7 @@ INDEX_DIR_IN_CONTAINER = "/app/index"
 
 ---
 
-## 📁 Data Files
+## Data Files
 
 ### Input
 - `htmls/*.html` - Raw HTML files from crawler
@@ -249,7 +249,7 @@ INDEX_DIR_IN_CONTAINER = "/app/index"
 
 ---
 
-## 🔍 Search Examples
+## Search Examples
 
 ### Command-line
 ```bash
@@ -271,7 +271,7 @@ Simply type queries in the search bar - results update automatically with full f
 
 ---
 
-## ⚙️ Technical Details
+## Technical Details
 
 ### Polite Crawling
 - User-Agent: `VINF-course-FIIT/1.0`
@@ -290,19 +290,6 @@ Simply type queries in the search bar - results update automatically with full f
 - **Document fields:** 20+ fields including metadata, enriched data, and searchable text
 - **Boosting:** Artist (2.0x), Date (3.0x), Songs (2.0x), Venue/City/Country/Tour (1.5x)
 - **Range queries:** Year, song count, venue opened year
-
----
-
-## 📝 Requirements
-
-```txt
-requests
-rich
-tiktoken
-PySide6
-pyspark (in Spark container)
-pylucene (in PyLucene container)
-```
 
 
 
